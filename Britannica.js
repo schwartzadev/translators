@@ -1,47 +1,47 @@
 {
-	"translatorID": "12c55893-43cc-4c35-be58-8e17a06bdcbf",
-	"label": "Britannica",
-	"creator": "Andrew Schwartz",
-	"target": "^https?://(www\\.)?britannica\\.com/",
-	"minVersion": "3.0",
-	"maxVersion": "",
-	"priority": 100,
-	"inRepository": true,
-	"translatorType": 4,
-	"browserSupport": "gcsibv",
-	"lastUpdated": "2019-12-19 06:04:04"
+    "translatorID": "12c55893-43cc-4c35-be58-8e17a06bdcbf",
+    "label": "Britannica",
+    "creator": "Andrew Schwartz",
+    "target": "^https?://(www\\.)?britannica\\.com/",
+    "minVersion": "3.0",
+    "maxVersion": "",
+    "priority": 100,
+    "inRepository": true,
+    "translatorType": 4,
+    "browserSupport": "gcsibv",
+    "lastUpdated": "2019-12-19 06:04:04"
 }
 
 /*
-	***** BEGIN LICENSE BLOCK *****
+    ***** BEGIN LICENSE BLOCK *****
 
-	Copyright © 2019 Andrew Schwartz
-	
-	This file is part of Zotero.
+    Copyright © 2019 Andrew Schwartz
+    
+    This file is part of Zotero.
 
-	Zotero is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Affero General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    Zotero is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	Zotero is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	GNU Affero General Public License for more details.
+    Zotero is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Affero General Public License for more details.
 
-	You should have received a copy of the GNU Affero General Public License
-	along with Zotero. If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Affero General Public License
+    along with Zotero. If not, see <http://www.gnu.org/licenses/>.
 
-	***** END LICENSE BLOCK *****
+    ***** END LICENSE BLOCK *****
 */
 
 
 function detectWeb(doc, url) {
   if (url.includes('/search?')) {
-	return "multiple";
+    return "multiple";
   } else if (url.includes("/biography/") || url.includes("/topic/") || url.includes('/science/')) {
-  	// todo complete this list
-	return "encylopediaArticle";
+      // todo complete this list
+    return "encylopediaArticle";
   }
   return false;
 }
@@ -52,26 +52,26 @@ function getSearchResults(doc, checkOnly) {  // todo remove/update this method
   // TODO: adjust the CSS selector
   var rows = doc.querySelectorAll('h2>a.title[href*="/article/"]');
   for (let row of rows) {
-	// TODO: check and maybe adjust
-	let href = row.href;
-	// TODO: check and maybe adjust
-	let title = ZU.trimInternal(row.textContent);
-	if (!href || !title) continue;
-	if (checkOnly) return true;
-	found = true;
-	items[href] = title;
+    // TODO: check and maybe adjust
+    let href = row.href;
+    // TODO: check and maybe adjust
+    let title = ZU.trimInternal(row.textContent);
+    if (!href || !title) continue;
+    if (checkOnly) return true;
+    found = true;
+    items[href] = title;
   }
   return found ? items : false;
 }
 
 function doWeb(doc, url) {
   if (detectWeb(doc, url) == "multiple") {
-	Zotero.selectItems(getSearchResults(doc, false), function (items) {
-	  if (items) ZU.processDocuments(Object.keys(items), scrape);
-	});
+    Zotero.selectItems(getSearchResults(doc, false), function (items) {
+      if (items) ZU.processDocuments(Object.keys(items), scrape);
+    });
   } else
   {
-	scrape(doc, url);
+    scrape(doc, url);
   }
 }
 
