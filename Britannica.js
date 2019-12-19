@@ -9,7 +9,7 @@
     "inRepository": true,
     "translatorType": 4,
     "browserSupport": "gcsibv",
-    "lastUpdated": "2019-12-19 06:04:04"
+    "lastUpdated": "2019-12-19 06:29:41"
 }
 
 /*
@@ -88,15 +88,20 @@ function getCreators(doc) {
   return creators
 }
 
+function getTags(doc) {
+    var tagsAsString = ZU.xpathText(doc, '//meta[@name="keywords"]/@content');
+    var tags = tagsAsString.split(", ");
+    return tags;
+}
 
-function scrape (doc, url) {
+
+function scrape(doc, url) {
   var newItem = new Zotero.Item("encyclopediaArticle");
   newItem.title = ZU.xpathText(doc, '//h1')
 
-  // todo add tags from meta keywords
-
   newItem.creators = getCreators(doc);
 
+  newItem.tags = getTags(doc);
   newItem.encyclopediaTitle = "Encyclopædia Britannica";
   newItem.date = ZU.xpathText(doc, '//div[@class="last-updated"]/time/@datetime')
   newItem.publisher = "Encyclopædia Britannica, inc.";
