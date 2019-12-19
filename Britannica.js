@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2019-12-19 04:59:29"
+	"lastUpdated": "2019-12-19 06:04:04"
 }
 
 /*
@@ -75,25 +75,27 @@ function doWeb(doc, url) {
   }
 }
 
-function getCreators(articleTopicId) {
-  var creatorNodes =  ZU.xpath(doc, '//div[@class="written-by"]/ul//li');
+function getCreators(doc) {
+  var creators = [];
 
-  for (var i = creatorNodes.length - 1; i >= 0; i--) {
-	var author = ZU.xpathText(creatorNodes[i], '*')
-	newItem.creators.push(
-		ZU.cleanAuthor(author, 'author', false)
-	)
+  var creatorString = ZU.xpathText(doc, '//div[@class="written-by"]/ul//li');
+  var detectedCreators = creatorString.split(", ")
+
+  for (var i = detectedCreators.length - 1; i >= 0; i--) {
+    creators.push(ZU.cleanAuthor(detectedCreators[i], "author", false));
   }
+  
+  return creators
 }
 
-function scrape (doc, url){
+
+function scrape (doc, url) {
   var newItem = new Zotero.Item("encyclopediaArticle");
   newItem.title = ZU.xpathText(doc, '//h1')
 
   // todo add tags from meta keywords
 
-  var articleTopicId = ZU.xpathText(doc, '//article[@class="article-content content"]/@data-topic-id');
-  // todo use this to get creators
+  newItem.creators = getCreators(doc);
 
   newItem.encyclopediaTitle = "Encyclopædia Britannica";
   newItem.date = ZU.xpathText(doc, '//div[@class="last-updated"]/time/@datetime')
