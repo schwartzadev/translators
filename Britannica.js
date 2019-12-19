@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2019-12-19 04:14:21"
+	"lastUpdated": "2019-12-19 04:59:29"
 }
 
 /*
@@ -38,39 +38,67 @@
 
 function detectWeb(doc, url) {
   if (url.includes('/search?')) {
-    return "multiple";
-  } else if (url.includes("/biography/") || url.includes("/topic/")) {
+	return "multiple";
+  } else if (url.includes("/biography/") || url.includes("/topic/") || url.includes('/science/')) {
   	// todo complete this list
-    return "encylopediaArticle";
+	return "encylopediaArticle";
   }
   return false;
 }
 
-function getSearchResults(doc, checkOnly) {
+function getSearchResults(doc, checkOnly) {  // todo remove/update this method
   var items = {};
   var found = false;
   // TODO: adjust the CSS selector
   var rows = doc.querySelectorAll('h2>a.title[href*="/article/"]');
   for (let row of rows) {
-    // TODO: check and maybe adjust
-    let href = row.href;
-    // TODO: check and maybe adjust
-    let title = ZU.trimInternal(row.textContent);
-    if (!href || !title) continue;
-    if (checkOnly) return true;
-    found = true;
-    items[href] = title;
+	// TODO: check and maybe adjust
+	let href = row.href;
+	// TODO: check and maybe adjust
+	let title = ZU.trimInternal(row.textContent);
+	if (!href || !title) continue;
+	if (checkOnly) return true;
+	found = true;
+	items[href] = title;
   }
   return found ? items : false;
 }
 
 function doWeb(doc, url) {
   if (detectWeb(doc, url) == "multiple") {
-    Zotero.selectItems(getSearchResults(doc, false), function (items) {
-      if (items) ZU.processDocuments(Object.keys(items), scrape);
-    });
+	Zotero.selectItems(getSearchResults(doc, false), function (items) {
+	  if (items) ZU.processDocuments(Object.keys(items), scrape);
+	});
   } else
   {
-    scrape(doc, url);
+	scrape(doc, url);
   }
+}
+
+function getCreators(articleTopicId) {
+  var creatorNodes =  ZU.xpath(doc, '//div[@class="written-by"]/ul//li');
+
+  for (var i = creatorNodes.length - 1; i >= 0; i--) {
+	var author = ZU.xpathText(creatorNodes[i], '*')
+	newItem.creators.push(
+		ZU.cleanAuthor(author, 'author', false)
+	)
+  }
+}
+
+function scrape (doc, url){
+  var newItem = new Zotero.Item("encyclopediaArticle");
+  newItem.title = ZU.xpathText(doc, '//h1')
+
+  // todo add tags from meta keywords
+
+  var articleTopicId = ZU.xpathText(doc, '//article[@class="article-content content"]/@data-topic-id');
+  // todo use this to get creators
+
+  newItem.encyclopediaTitle = "Encyclopædia Britannica";
+  newItem.date = ZU.xpathText(doc, '//div[@class="last-updated"]/time/@datetime')
+  newItem.publisher = "Encyclopædia Britannica, inc.";
+  newItem.url = url;
+
+  newItem.complete();
 }
