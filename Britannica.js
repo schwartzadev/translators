@@ -59,7 +59,7 @@ function isArticle(doc) {
 }
 
 function detectWeb(doc, url) {
-  if (url.includes('/search?')) {
+  if (url.includes('/search?')) { // todo fix this
     return "multiple";
   } else if (isArticle(doc)) {
     return "encylopediaArticle";
