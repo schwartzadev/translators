@@ -45,9 +45,9 @@ function getArticleDetails(doc) {
 
   return {
     'articleId': articleId,
-    'url': articleDetails['shareUrl'],
-    'title': articleDetails['title']
-  }
+    'url': articleDetails.shareUrl,
+    'title': articleDetails.title
+  };
 }
 
 function isArticle(doc) {
@@ -90,8 +90,7 @@ function doWeb(doc, url) {
     Zotero.selectItems(getSearchResults(doc, false), function (items) {
       if (items) ZU.processDocuments(Object.keys(items), scrape);
     });
-  } else
-  {
+  } else {
     scrape(doc, url);
   }
 }
@@ -100,13 +99,13 @@ function getCreators(doc) {
   var creators = [];
 
   var creatorString = ZU.xpathText(doc, '//div[@class="written-by"]/ul//li');
-  var detectedCreators = creatorString.split(", ")
+  var detectedCreators = creatorString.split(", ");
 
   for (var i = detectedCreators.length - 1; i >= 0; i--) {
     creators.push(ZU.cleanAuthor(detectedCreators[i], "author", false));
   }
   
-  return creators
+  return creators;
 }
 
 function getTags(doc) {
@@ -119,14 +118,14 @@ function scrape(doc, url) {
   var articleDetails = getArticleDetails(doc);
 
   var newItem = new Zotero.Item("encyclopediaArticle");
-  newItem.title = articleDetails['title'];
-  newItem.url = articleDetails['url'];
+  newItem.title = articleDetails.title;
+  newItem.url = articleDetails.url;
 
   newItem.creators = getCreators(doc);
 
   newItem.tags = getTags(doc);
   newItem.encyclopediaTitle = "Encyclopædia Britannica";
-  newItem.date = ZU.xpathText(doc, '//div[@class="last-updated"]/time/@datetime')
+  newItem.date = ZU.xpathText(doc, '//div[@class="last-updated"]/time/@datetime');
   newItem.publisher = "Encyclopædia Britannica, inc.";
 
   newItem.complete();
