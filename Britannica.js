@@ -59,7 +59,7 @@ function isArticle(doc) {
 }
 
 function detectWeb(doc, url) {
-  if (url.includes('/search?')) { // todo fix this
+  if (url.includes('/search?')) { // this *does not* include the homepage, etc.
     return "multiple";
   } else if (isArticle(doc)) {
     return "encylopediaArticle";
@@ -67,17 +67,15 @@ function detectWeb(doc, url) {
   return false;
 }
 
-function getSearchResults(doc, checkOnly) {  // todo remove/update this method
+function getSearchResults(doc, checkOnly) {
   var items = {};
   var found = false;
-  // TODO: adjust the CSS selector
-  var rows = doc.querySelectorAll('h2>a.title[href*="/article/"]');
+  var rows = ZU.xpath(doc, '//ul[@class="results"]//li/a');
   for (let row of rows) {
-    // TODO: check and maybe adjust
     let href = row.href;
-    // TODO: check and maybe adjust
     let title = ZU.trimInternal(row.textContent);
     if (!href || !title) continue;
+    if (!href.includes('/topic/')) continue; // remove section results, etc.
     if (checkOnly) return true;
     found = true;
     items[href] = title;
