@@ -50,11 +50,18 @@ function getArticleDetails(doc) {
   }
 }
 
+function isArticle(doc) {
+  var topicJson = ZU.xpathText(doc, '//script[@class="topic-json"][@type="application/json"]');
+  if (topicJson == null) {
+    return false;
+  }
+  return true;
+}
+
 function detectWeb(doc, url) {
   if (url.includes('/search?')) {
     return "multiple";
-  } else if (url.includes("/biography/") || url.includes("/topic/") || url.includes('/science/')) {
-      // todo complete this list
+  } else if (isArticle(doc)) {
     return "encylopediaArticle";
   }
   return false;
