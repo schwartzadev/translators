@@ -36,6 +36,20 @@
 */
 
 
+function getArticleDetails(doc) {
+  var topicJson = JSON.parse(
+    ZU.xpathText(doc, '//script[@class="topic-json"][@type="application/json"]')
+  );
+  var articleId = Object.keys(topicJson)[0];
+  var articleDetails = topicJson[articleId];
+
+  return {
+    'articleId': articleId,
+    'url': articleDetails['shareUrl'],
+    'title': articleDetails['title']
+  }
+}
+
 function detectWeb(doc, url) {
   if (url.includes('/search?')) {
     return "multiple";
@@ -94,10 +108,12 @@ function getTags(doc) {
     return tags;
 }
 
-
 function scrape(doc, url) {
+  var articleDetails = getArticleDetails(doc);
+
   var newItem = new Zotero.Item("encyclopediaArticle");
-  newItem.title = ZU.xpathText(doc, '//h1')
+  newItem.title = articleDetails['title'];
+  newItem.url = articleDetails['url'];
 
   newItem.creators = getCreators(doc);
 
@@ -105,7 +121,6 @@ function scrape(doc, url) {
   newItem.encyclopediaTitle = "Encyclopædia Britannica";
   newItem.date = ZU.xpathText(doc, '//div[@class="last-updated"]/time/@datetime')
   newItem.publisher = "Encyclopædia Britannica, inc.";
-  newItem.url = url;
 
   newItem.complete();
 }
